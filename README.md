@@ -30,12 +30,6 @@ Built with a powerful **n8n** automation workflow and **Google's Gemini AI**, th
 **Try the live application here:**  
 ### [https://applyiq.saikrishnamotaparthi.tech](https://applyiq.saikrishnamotaparthi.tech)
 
-**Desktop View:**  
-<img src="URL_TO_YOUR_DESKTOP_SCREENSHOT.png" alt="ApplyIQ Desktop UI" width="100%">
-
-**Mobile View:**  
-<img src="URL_TO_YOUR_MOBILE_SCREENSHOT.png" alt="ApplyIQ Mobile UI" width="300">
-
 *(**Tip:** To get these URLs, simply take screenshots, drag them into a new GitHub Issue in your repository, and copy the image URLs that are generated.)*
 
 ---
