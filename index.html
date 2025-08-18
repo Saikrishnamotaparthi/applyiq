@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApplyIQ - AI Resume Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --surface-color: #16213e;
+            --primary-color: #0f3460;
+            --accent-color: #e94560;
+            --text-color: #f0f0f0;
+            --text-muted: #a0a0c0;
+            --border-color: rgba(83, 114, 240, 0.5);
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warn-color: #f39c12;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        /* Upload form */
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            background-color: #0f346080;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: var(--accent-color);
+        }
+
+        .file-input-wrapper p {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .file-input-wrapper span {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        #analyzeButton {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--border-color), var(--accent-color));
+            cursor: pointer;
+        }
+
+        #analyzeButton:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        /* Gauge styles */
+        .gauge-wrapper {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .gauge-wrapper svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .gauge-arc {
+            fill: none;
+            stroke-width: 20;
+            stroke-linecap: round;
+        }
+
+        .arc-track {
+            stroke: var(--primary-color);
+        }
+
+        .arc-score {
+            stroke: url(#scoreGradient);
+            stroke-dasharray: 251.2;
+            /* Half circumference of r=80 */
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 1.5s ease;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .gauge-score {
+            font-size: 3.5rem;
+            font-weight: 800;
+        }
+
+        .gauge-max {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .verdict-title {
+            text-align: center;
+            font-size: 1.6rem;
+            margin: 20px 0 10px;
+            font-weight: 700;
+        }
+
+        .verdict-reason {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Analysis cards */
+        .analysis-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .analysis-box {
+            background: var(--primary-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .analysis-box h3 {
+            margin-bottom: 10px;
+            border-bottom: 2px solid;
+            padding-bottom: 5px;
+        }
+
+        .pros h3 {
+            border-color: var(--success-color);
+        }
+
+        .cons h3 {
+            border-color: var(--danger-color);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        li .icon {
+            margin-top: 2px;
+        }
+
+        @media(max-width: 768px) {
+            .analysis-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>ApplyIQ</h1>
+        <p class="subtitle">Gain the AI Edge. Elevate your resume for the perfect job match.</p>
+
+        <!-- Upload Form -->
+        <form id="analyzerForm">
+            <div class="upload-section">
+                <label for="resumeFile" class="file-input-wrapper">
+                    <p>Resume PDF</p>
+                    <span id="resumeFileName">Click or Drag & Drop</span>
+                </label>
+                <input type="file" id="resumeFile" name="resumeFile" accept=".pdf" required>
+
+                <label for="jdFile" class="file-input-wrapper">
+                    <p>Job Description PDF</p>
+                    <span id="jdFileName">Click or Drag & Drop</span>
+                </label>
+                <input type="file" id="jdFile" name="jdFile" accept=".pdf" required>
+            </div>
+            <button type="submit" id="analyzeButton">Analyze Now</button>
+        </form>
+
+        <!-- Results -->
+        <div id="results" class="hidden"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('analyzerForm');
+        const resultsDiv = document.getElementById('results');
+        const button = document.getElementById('analyzeButton');
+
+        const N8N_WEBHOOK_URL = "https://1b6a2f6a1fdc.ngrok-free.app/webhook/c2965a19-d85e-4e77-b5b7-d9465d9b6c23";
+
+        // file name display
+        ['resume', 'jd'].forEach(type => {
+            const input = document.getElementById(`${type}File`);
+            const textSpan = document.getElementById(`${type}FileName`);
+            input.addEventListener('change', () => {
+                textSpan.textContent = input.files.length > 0 ? input.files[0].name : 'Click or Drag & Drop';
+            });
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            button.disabled = true;
+            button.textContent = "Analyzing...";
+
+            try {
+                const formData = new FormData(form);
+                const res = await fetch(N8N_WEBHOOK_URL, { method: 'POST', body: formData });
+                if (!res.ok) throw new Error(`n8n error ${res.status}`);
+                const data = await res.json();
+                if (data.finalResponse) displayResults(data.finalResponse);
+            } catch (err) {
+                resultsDiv.innerHTML = `<p style="color:red;text-align:center"><b>Error:</b> ${err.message}</p>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = "Analyze Now";
+            }
+        });
+
+        function displayResults(data) {
+            const { rating = 0, pros = [], cons = [], missingKeywords = [], isEligible = false, eligibilityReasoning = "N/A" } = data;
+            const eligibilityText = isEligible ? 'Ideal Match' : 'Not an Ideal Match';
+            const eligibilityColor = isEligible ? 'var(--success-color)' : 'var(--danger-color)';
+
+            resultsDiv.innerHTML = `
+        <div class="gauge-wrapper">
+          <svg viewBox="0 0 200 150">
+            <defs>
+              <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="var(--danger-color)" />
+                <stop offset="50%" stop-color="var(--warn-color)" />
+                <stop offset="100%" stop-color="var(--success-color)" />
+              </linearGradient>
+            </defs>
+            <path class="gauge-arc arc-track" d="M 20,120 A 80,80 0 0,1 180,120" />
+            <path class="gauge-arc arc-score" id="score-arc" d="M 20,120 A 80,80 0 0,1 180,120" />
+          </svg>
+          <div class="gauge-text">
+            <div class="gauge-label">YOUR SCORE:</div>
+            <div class="gauge-score">${rating}</div>
+            <div class="gauge-max">OF 100</div>
+          </div>
+        </div>
+        <h2 class="verdict-title" style="color:${eligibilityColor};">${eligibilityText}</h2>
+        <p class="verdict-reason">${eligibilityReasoning}</p>
+        <div class="analysis-details">
+          <div class="analysis-box pros">
+            <h3>Pros (Strengths)</h3>
+            <ul>${pros.map(p => `<li><span class="icon">✅</span>${p}</li>`).join('') || '<li>None</li>'}</ul>
+          </div>
+          <div class="analysis-box cons">
+            <h3>Cons (Gaps)</h3>
+            <ul>${cons.map(c => `<li><span class="icon">❌</span>${c}</li>`).join('') || '<li>None</li>'}</ul>
+          </div>
+        </div>
+        <div class="analysis-box">
+          <h3>Missing Keywords</h3>
+          <ul>${missingKeywords.map(k => `<li>- ${k}</li>`).join('') || '<li>None</li>'}</ul>
+        </div>
+      `;
+
+            // animate arc
+            setTimeout(() => {
+                const scoreArc = document.getElementById("score-arc");
+                const totalLength = 251.2;
+                const scoreAsDecimal = rating / 100;
+                const dashOffset = totalLength * (1 - scoreAsDecimal);
+                scoreArc.style.strokeDashoffset = dashOffset;
+            }, 100);
+        }
+    </script>
+</body>
+
+</html>
