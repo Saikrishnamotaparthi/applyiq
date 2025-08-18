@@ -25,12 +25,10 @@ Built with a powerful **n8n** automation workflow and **Google's Gemini AI**, th
 
 ---
 
-### 🎥 Live Demo & Screenshots
+### 🎥 Live Demo
 
 **Try the live application here:**  
 ### [https://applyiq.saikrishnamotaparthi.tech](https://applyiq.saikrishnamotaparthi.tech)
-
-*(**Tip:** To get these URLs, simply take screenshots, drag them into a new GitHub Issue in your repository, and copy the image URLs that are generated.)*
 
 ---
 
